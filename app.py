@@ -3,18 +3,19 @@
 
 import os
 
-from flask import Flask, jsonify, request, render_template, redirect, session
+from flask import Flask, jsonify, request, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
 
 from models import connect_db, db, User
-from forms import RegisterForm
+from forms import RegisterForm, LoginForm
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = "secret"
-
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     "DATABASE_URL", "postgresql:///notes")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ECHO'] = True
 
 connect_db(app)
 
@@ -62,3 +63,48 @@ def show_register_form():
 @app.route("/login", methods=["GET", "POST"])
 def show_login_form():
     """Display login form or submit login form."""
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        name = form.username.data
+        password = form.password.data
+
+        user = User.authenticate(name, password)
+
+        if user:
+            session["username"] = user.username
+            return redirect(f"/users/{user.username}")
+        else:
+            form.username.errors = ['Bad name/password']
+
+    else:
+        flash('how did you get here?')
+
+    return render_template("login.html", form=form)
+
+
+@app.post('/logout')
+def logout_user():
+
+    session.pop("username", None)
+
+    return redirect('/')
+
+
+
+
+@app.get('/users/<username>')
+def show_user_details(username):
+    """Show template of user (everything except password)"""
+
+    #check if passed in username = session username
+
+    if session.get("username") == username:
+
+        user = User.query.filter_by(username=username).one_or_none()
+
+        return render_template("user_detail.html", user=user)
+    else:
+        flash('Please log in as that user to view that page')
+        return redirect('/')

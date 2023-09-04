@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}<h1>Register User</h1>{% endblock %}
+
+{% block title %}<h1>Login User</h1>{% endblock %}
 
 {% block content %}
 
@@ -8,7 +9,7 @@
 <p style="color:red; ">{{ msg }}</p>
 {% endfor %}
 
-<form action="/register" method="POST" class="register-form">
+<form action="/login" method="POST" class="login-form">
 
   {{ form.hidden_tag() }}
 
@@ -23,13 +24,7 @@
 
   {% endfor %}
 
-  <button class="new-user-submit" type="submit">Register User</button>
+  <button class="user-login-submit" type="submit">Login User</button>
 </form>
 
-
-<form action="/logout" method="POST" class="logout-form">
-  {{ form.hidden_tag() }}
-
-  <button class="logout-submit" type="submit">Logout</button>
-</form>
 {% endblock %}

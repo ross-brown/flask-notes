@@ -10,7 +10,8 @@ class RegisterForm(FlaskForm):
 
     password = StringField("Password: ", validators=[InputRequired()])
 
-    email = StringField("Email: ", validators=[InputRequired(), Email()])
+    #FIXME: We want to validate that this is email, need to pip install something.
+    email = StringField("Email: ", validators=[InputRequired()])
 
     first_name = StringField("First Name: ", validators=[InputRequired()])
 
@@ -18,3 +19,9 @@ class RegisterForm(FlaskForm):
 
 
     # def validate_email(self):
+
+
+class LoginForm(FlaskForm):
+    username = StringField("Username: ", validators=[InputRequired()])
+
+    password = StringField("Password: ", validators=[InputRequired()])

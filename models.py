@@ -13,7 +13,6 @@ def connect_db(app):
 
     You should call this in your Flask app.
     """
-
     app.app_context().push()
     db.app = app
     db.init_app(app)
@@ -60,7 +59,7 @@ class User(db.Model):
 
     @classmethod
     def authenticate(cls, username, password):
-        """Authenticate if credenitials exists, if so, return user instance."""
+        """Authenticate if credentials exists, if so, return user instance."""
 
         user = cls.query.filter_by(username=username).one_or_none()
 
