@@ -13,5 +13,9 @@
 <p>{{ user.email }}</p>
 
 
+<form action="/logout" method="POST" class="logout-form">
+  {{ form.hidden_tag() }}
 
+  <button class="logout-submit" type="submit">Logout</button>
+</form>
 {% endblock %}

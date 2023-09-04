@@ -7,7 +7,7 @@ from flask import Flask, jsonify, request, render_template, redirect, session, f
 from flask_debugtoolbar import DebugToolbarExtension
 
 from models import connect_db, db, User
-from forms import RegisterForm, LoginForm
+from forms import RegisterForm, LoginForm, LogoutForm
 
 app = Flask(__name__)
 
@@ -86,8 +86,10 @@ def show_login_form():
 
 @app.post('/logout')
 def logout_user():
+    form = LogoutForm()
 
-    session.pop("username", None)
+    if form.validate_on_submit():
+        session.pop("username", None)
 
     return redirect('/')
 
@@ -97,14 +99,14 @@ def logout_user():
 @app.get('/users/<username>')
 def show_user_details(username):
     """Show template of user (everything except password)"""
-
+    form = LogoutForm()
     #check if passed in username = session username
 
     if session.get("username") == username:
 
         user = User.query.filter_by(username=username).one_or_none()
 
-        return render_template("user_detail.html", user=user)
+        return render_template("user_detail.html", user=user, form=form)
     else:
         flash('Please log in as that user to view that page')
         return redirect('/')
