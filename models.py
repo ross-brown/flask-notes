@@ -73,27 +73,30 @@ class User(db.Model):
         else:
             return False
 
-    class Note(db.Model):
-        """Note."""
 
-        __tablename__ = 'notes'
 
-        id = db.Column(
-            db.Integer,
-            primary_key=True,
-            autoincrement=True
-        )
+class Note(db.Model):
+    """Note."""
 
-        title = db.Column(
-            db.String(100),
-            nullable=False
-        )
+    __tablename__ = 'notes'
 
-        content = db.Column(
-            db.Text,
-            nullable=False
-        )
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True
+    )
 
-        owner_username = db.Column(
-            db.ForeignKey("users.username")
-        )
+    title = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    content = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    owner_username = db.Column(
+        db.String(20),
+        db.ForeignKey("users.username")
+    )

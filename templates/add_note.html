@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}<h1>Update</h1>{% endblock %}
+
+{% block content %}
+
+{% for msg in get_flashed_messages() %}
+<p style="color:red; ">{{ msg }}</p>
+{% endfor %}
+
+<form method="POST" class="edit-note-form">
+
+  {{ form.hidden_tag() }}
+
+  {% for field in form if field.widget.input_type != "hidden" %}
+  <div class="note-input">
+    {{ field.label }}
+    {{ field }}
+    {% for error in field.errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
+
+  {% endfor %}
+
+  <button class="note-submit" type="submit">Edit Note</button>
+</form>
+
+{% endblock %}
