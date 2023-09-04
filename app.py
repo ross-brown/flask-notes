@@ -106,8 +106,9 @@ def show_user_details(username):
     """Show template of user (everything except password)"""
 
     if session.get(AUTH_KEY) == username:
-        form = CSRFForm()
 
+        form = CSRFForm()
+        print('\n\n\n got to user detail')
         user = User.query.filter_by(username=username).one_or_none()
 
         return render_template("user_detail.html", user=user, form=form, notes=user.notes)
@@ -206,7 +207,7 @@ def delete_note(note_id):
     form = CSRFForm()
 
     if form.validate_on_submit():
-
+        print('\n\n\n validated delete request')
         note = Note.query.get(note_id)
         user = note.user
 
@@ -218,6 +219,7 @@ def delete_note(note_id):
         return redirect(f"/users/{user.username}")
 
     else:
+        print('\n\n\n failed to validate')
         return redirect("/")
 # POST /notes/<note-id>/delete
 #     Delete a note and redirect to /users/<username>.

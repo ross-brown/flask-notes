@@ -2,6 +2,7 @@ import os
 
 os.environ["DATABASE_URL"] = 'postgresql:///notes_test'
 
+from flask import session
 from unittest import TestCase
 
 from app import app
@@ -46,3 +47,19 @@ class NotesViewsTestCase(TestCase):
         """Clean up fouled transactions."""
 
         db.session.rollback()
+
+
+    def get_register_page(self):
+        with app.test_client() as client:
+            resp = client.get("/register")
+
+
+    def register_new_user(self):
+        with app.test_client() as client:
+
+            new_user_form = {
+
+            }
+            resp = client.post("/register", data=new_user_form)
+
+            resp = client.post(url, json=CUPCAKE_DATA_2)

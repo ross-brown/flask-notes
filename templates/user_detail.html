@@ -18,6 +18,7 @@
       <i class="bi bi-pencil-square"></i>
     </a>
     <form action="/notes/{{note.id}}/delete" method="POST">
+      {{ form.hidden_tag() }}
       <button class="btn btn-danger btn-sm" type="submit">
         <i class="bi bi-trash"></i>
       </button>
