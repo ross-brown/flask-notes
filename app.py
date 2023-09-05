@@ -3,11 +3,11 @@
 
 import os
 
-from flask import Flask, jsonify, request, render_template, redirect, session, flash
+from flask import Flask, jsonify, request, render_template, redirect, session, flash, abort
 from flask_debugtoolbar import DebugToolbarExtension
 
 from models import connect_db, db, User, Note
-from forms import RegisterForm, LoginForm, LogoutForm, NoteForm
+from forms import RegisterForm, LoginForm, CSRFForm, NoteForm, EditNoteForm
 
 AUTH_KEY = "username"
 
@@ -38,6 +38,9 @@ def show_homepage():
 @app.route("/register", methods=["GET", "POST"])
 def show_register_form():
     """Display register form or submit register form."""
+
+    if session.get(AUTH_KEY):
+        return redirect(f"/users/{session[AUTH_KEY]}")
 
     form = RegisterForm()
 
@@ -90,7 +93,7 @@ def show_login_form():
 def logout_user():
     """Logs out user from session and redirects to root route."""
 
-    form = LogoutForm()
+    form = CSRFForm()
 
     if form.validate_on_submit():
         session.pop(AUTH_KEY, None)
@@ -103,7 +106,7 @@ def show_user_details(username):
     """Show template of user (everything except password)"""
 
     if session.get(AUTH_KEY) == username:
-        form = LogoutForm()
+        form = CSRFForm()
 
         user = User.query.filter_by(username=username).one_or_none()
 
@@ -112,9 +115,11 @@ def show_user_details(username):
         flash('Please log in as that user to view that page')
         return redirect('/')
 
-
+# TODO: add comments to separate sections of routes
 # POST /users/<username>/delete
 #     Remove the user from the database. Log the user out and redirect to /.
+
+
 @app.post("/users/<username>/delete")
 def delete_user(username):
     """Delete user from DB and redirect to homepage."""
@@ -132,8 +137,7 @@ def delete_user(username):
 
         return redirect("/")
     else:
-        flash('Please log in as that user to view that page')
-        return redirect('/')
+        abort(401)
 
 
 @app.route('/users/<username>/notes/add', methods=["GET", "POST"])
@@ -173,7 +177,7 @@ def show_edit_note_form(note_id):
     if not session.get(AUTH_KEY) == username:
         return redirect('/')
 
-    form = NoteForm(obj=note)
+    form = EditNoteForm(obj=note)
 
     if form.validate_on_submit():
         title = form.title.data
@@ -198,12 +202,21 @@ def show_edit_note_form(note_id):
 @app.post('/notes/<int:note_id>/delete')
 def delete_note(note_id):
     """Deletes a note and redirects"""
-    note = Note.query.get(note_id)
-    user = note.user
 
-    db.session.delete(note)
-    db.session.commit()
+    form = CSRFForm()
 
-    return redirect(f"/users/{user.username}")
+    if form.validate_on_submit():
+        note = Note.query.get(note_id)
+        user = note.user
+
+        if session[AUTH_KEY] == user.username:
+
+            db.session.delete(note)
+            db.session.commit()
+
+        return redirect(f"/users/{user.username}")
+
+    else:
+        return redirect("/")
 # POST /notes/<note-id>/delete
 #     Delete a note and redirect to /users/<username>.

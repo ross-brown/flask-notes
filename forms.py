@@ -10,7 +10,7 @@ class RegisterForm(FlaskForm):
                            InputRequired(), Length(max=20)])
 
     password = PasswordField("Password: ", validators=[
-                           InputRequired(), Length(max=100)])
+        InputRequired(), Length(max=100)])
 
     email = StringField("Email: ", validators=[
                         InputRequired(), Email(), Length(max=50)])
@@ -29,10 +29,10 @@ class LoginForm(FlaskForm):
                            InputRequired(), Length(max=20)])
 
     password = PasswordField("Password: ", validators=[
-                           InputRequired(), Length(max=100)])
+        InputRequired(), Length(max=100)])
 
 
-class LogoutForm(FlaskForm):
+class CSRFForm(FlaskForm):
     """ Form just for CSRF Protection"""
 
 
@@ -43,3 +43,7 @@ class NoteForm(FlaskForm):
 
     content = TextAreaField("Content: ", validators=[
                             InputRequired()])
+
+#TODO: use this
+class EditNoteForm(NoteForm):
+    """Form for editing notes."""
