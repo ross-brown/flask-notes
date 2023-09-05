@@ -206,6 +206,7 @@ def delete_note(note_id):
     form = CSRFForm()
 
     if form.validate_on_submit():
+
         note = Note.query.get(note_id)
         user = note.user
 
