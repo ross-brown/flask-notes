@@ -101,6 +101,9 @@ def logout_user():
     return redirect('/')
 
 
+# USER ROUTES ##################################
+
+
 @app.get('/users/<username>')
 def show_user_details(username):
     """Show template of user (everything except password)"""
@@ -116,29 +119,30 @@ def show_user_details(username):
         flash('Please log in as that user to view that page')
         return redirect('/')
 
-# TODO: add comments to separate sections of routes
-# POST /users/<username>/delete
-#     Remove the user from the database. Log the user out and redirect to /.
-
 
 @app.post("/users/<username>/delete")
 def delete_user(username):
     """Delete user from DB and redirect to homepage."""
-    if session.get(AUTH_KEY) == username:
-        user = User.query.get(username)
-        notes = user.notes
+    form = CSRFForm()
 
-        for note in notes:
-            db.session.delete(note)
+    if form.validate_on_submit():
+        if session.get(AUTH_KEY) == username:
+            user = User.query.get(username)
+            notes = user.notes
 
-        db.session.delete(user)
-        db.session.commit()
+            for note in notes:
+                db.session.delete(note)
 
-        session.pop(AUTH_KEY, None)  # logout user
+            db.session.delete(user)
+            db.session.commit()
 
-        return redirect("/")
+            session.pop(AUTH_KEY, None)  # logout user
+
+            return redirect("/")
+        else:
+            abort(401)
     else:
-        abort(401)
+        return redirect("/")
 
 
 @app.route('/users/<username>/notes/add', methods=["GET", "POST"])
@@ -162,11 +166,9 @@ def show_add_note_form(username):
     else:
         user = User.query.get(username)
         return render_template('add_note.html', user=user, form=form)
-# GET /users/<username>/notes/add
-#     Display form to add notes.
 
-# POST /users/<username>/notes/add
-#     Add a new note and redirect to /users/<username>
+
+# NOTES ROUTES ##############################################
 
 
 @app.route('/notes/<int:note_id>/update', methods=["GET", "POST"])
@@ -193,12 +195,6 @@ def show_edit_note_form(note_id):
     else:
         return render_template('edit_note.html', form=form)
 
-# GET /notes/<note-id>/update
-#     Display form to edit a note.
-
-# POST /notes/<note-id>/update
-#     Update a note and redirect to /users/<username>.
-
 
 @app.post('/notes/<int:note_id>/delete')
 def delete_note(note_id):
@@ -221,5 +217,3 @@ def delete_note(note_id):
     else:
         print('\n\n\n failed to validate')
         return redirect("/")
-# POST /notes/<note-id>/delete
-#     Delete a note and redirect to /users/<username>.
