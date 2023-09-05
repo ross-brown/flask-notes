@@ -113,7 +113,6 @@ def show_user_details(username):
         return redirect('/')
 
 
-
 # POST /users/<username>/delete
 #     Remove the user from the database. Log the user out and redirect to /.
 @app.post("/users/<username>/delete")
@@ -123,11 +122,13 @@ def delete_user(username):
         user = User.query.get(username)
         notes = user.notes
 
-        db.session.delete(notes)
+        for note in notes:
+            db.session.delete(note)
+
         db.session.delete(user)
         db.session.commit()
 
-        session.pop(AUTH_KEY, None) #logout user
+        session.pop(AUTH_KEY, None)  # logout user
 
         return redirect("/")
     else:
@@ -137,7 +138,7 @@ def delete_user(username):
 
 @app.route('/users/<username>/notes/add', methods=["GET", "POST"])
 def show_add_note_form(username):
-    """"""
+    """Display add note form or adds note and redirects to user profile."""
     if not session.get(AUTH_KEY) == username:
         return redirect('/')
 
@@ -147,7 +148,7 @@ def show_add_note_form(username):
         title = form.title.data
         content = form.content.data
 
-        new_note = Note(title, content, username)
+        new_note = Note(title=title, content=content, owner_username=username)
 
         db.session.add(new_note)
         db.session.commit()
@@ -161,8 +162,6 @@ def show_add_note_form(username):
 
 # POST /users/<username>/notes/add
 #     Add a new note and redirect to /users/<username>
-
-
 
 
 @app.route('/notes/<int:note_id>/update', methods=["GET", "POST"])
@@ -208,7 +207,3 @@ def delete_note(note_id):
     return redirect(f"/users/{user.username}")
 # POST /notes/<note-id>/delete
 #     Delete a note and redirect to /users/<username>.
-
-
-
-
