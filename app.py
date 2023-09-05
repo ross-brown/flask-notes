@@ -9,6 +9,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, db, User
 from forms import RegisterForm, LoginForm, LogoutForm
 
+AUTH_KEY = "username"
+
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = "secret"
@@ -52,7 +54,7 @@ def show_register_form():
         db.session.add(new_user)
         db.session.commit()
 
-        session["username"] = new_user.username
+        session[AUTH_KEY] = new_user.username
 
         return redirect(f"/users/{new_user.username}")
 
@@ -64,6 +66,9 @@ def show_register_form():
 def show_login_form():
     """Display login form or submit login form."""
 
+    if session.get(AUTH_KEY):
+        return redirect(f"/users/{session[AUTH_KEY]}")
+
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -73,13 +78,10 @@ def show_login_form():
         user = User.authenticate(name, password)
 
         if user:
-            session["username"] = user.username
+            session[AUTH_KEY] = user.username
             return redirect(f"/users/{user.username}")
         else:
             form.username.errors = ['Bad name/password']
-
-    else:
-        flash('how did you get here?')
 
     return render_template("login.html", form=form)
 
@@ -91,7 +93,7 @@ def logout_user():
     form = LogoutForm()
 
     if form.validate_on_submit():
-        session.pop("username", None)
+        session.pop(AUTH_KEY, None)
 
     return redirect('/')
 
@@ -100,14 +102,18 @@ def logout_user():
 def show_user_details(username):
     """Show template of user (everything except password)"""
 
-    form = LogoutForm()
-    # check if passed in username = session username
-
-    if session.get("username") == username:
+    if session.get(AUTH_KEY) == username:
+        form = LogoutForm()
 
         user = User.query.filter_by(username=username).one_or_none()
 
-        return render_template("user_detail.html", user=user, form=form)
+        return render_template("user_detail.html", user=user, form=form, notes=user.notes)
     else:
         flash('Please log in as that user to view that page')
         return redirect('/')
+
+
+@app.post("/users/<username>/delete")
+def delete_user(username):
+    """Delete user from DB and redirect to homepage."""
+    

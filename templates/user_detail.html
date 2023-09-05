@@ -12,6 +12,23 @@
 <p>{{ user.last_name }}</p>
 <p>{{ user.email }}</p>
 
+<ul>
+  {% for note in notes %}
+  <li>
+    <a href="/notes/{{note.id}}/update">Edit</a>
+    <form action="/notes/{{note.id}}/delete" method="POST">
+      <button type="submit">Delete</button>
+    </form>
+    {{note.title}}
+  </li>
+  {% endfor %}
+</ul>
+
+<a href="/users/{{user.username}}/notes/add">Add a note</a>
+
+<form action="/users/{{user.username}}/delete" method="POST">
+  <button type="submit">Delete Account</button>
+</form>
 
 <form action="/logout" method="POST" class="logout-form">
   {{ form.hidden_tag() }}
