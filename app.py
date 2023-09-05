@@ -86,6 +86,8 @@ def show_login_form():
 
 @app.post('/logout')
 def logout_user():
+    """Logs out user from session and redirects to root route."""
+
     form = LogoutForm()
 
     if form.validate_on_submit():
@@ -94,13 +96,12 @@ def logout_user():
     return redirect('/')
 
 
-
-
 @app.get('/users/<username>')
 def show_user_details(username):
     """Show template of user (everything except password)"""
+
     form = LogoutForm()
-    #check if passed in username = session username
+    # check if passed in username = session username
 
     if session.get("username") == username:
 

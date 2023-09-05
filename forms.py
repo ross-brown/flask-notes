@@ -10,22 +10,23 @@ class RegisterForm(FlaskForm):
 
     password = StringField("Password: ", validators=[InputRequired()])
 
-    #FIXME: We want to validate that this is email, need to pip install something.
+    # FIXME: We want to validate that this is email, need to pip install something.
     email = StringField("Email: ", validators=[InputRequired(), Email()])
 
     first_name = StringField("First Name: ", validators=[InputRequired()])
 
     last_name = StringField("Last Name: ", validators=[InputRequired()])
 
-
     # def validate_email(self):
 
 
 class LoginForm(FlaskForm):
+    """Form for logging in a user."""
+
     username = StringField("Username: ", validators=[InputRequired()])
 
     password = StringField("Password: ", validators=[InputRequired()])
 
 
-class LogoutForm(Flaskform):
-
+class LogoutForm(FlaskForm):
+    """ Form just for CSRF Protection"""
